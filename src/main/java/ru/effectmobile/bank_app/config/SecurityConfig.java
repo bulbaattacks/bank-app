@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 import static ru.effectmobile.bank_app.entity.User.Role.ADMIN;
 import static ru.effectmobile.bank_app.entity.User.Role.USER;
@@ -46,6 +47,11 @@ public class SecurityConfig {
                         req.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
                                 .requestMatchers("/user/**").hasAnyRole(ADMIN.name(), USER.name())
+                                .requestMatchers(GET, "/card").hasAnyRole(ADMIN.name())
+                                .requestMatchers(GET, "/card/{id}").hasAnyRole(ADMIN.name(), USER.name())
+                                .requestMatchers(POST, "/card/**").hasAnyRole(ADMIN.name())
+//                                .requestMatchers(PATCH, "/card/**").hasAnyRole(ADMIN.name()) TODO
+//                                .requestMatchers(DELETE, "/card/**").hasAnyRole(ADMIN.name()) TODO
                                 .anyRequest()
                                 .authenticated()
                 )

@@ -4,6 +4,5 @@ CREATE TABLE IF NOT EXISTS bank.users (
     id              bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     email           varchar(320) NOT NULL UNIQUE,
     password        varchar(64) NOT NULL,
-    role            varchar(16) NOT NULL,
-    CONSTRAINT chk_role CHECK (role IN ('ADMIN', 'USER'))
+    role            varchar(16) NOT NULL CHECK (role IN ('ADMIN', 'USER'))
 );
