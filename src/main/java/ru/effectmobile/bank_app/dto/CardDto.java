@@ -19,7 +19,7 @@ public class CardDto {
     private Integer number;
     @NotNull
     private Long ownerId;
-    @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDate validityPeriod;
     @NotNull
     private Card.Status status;

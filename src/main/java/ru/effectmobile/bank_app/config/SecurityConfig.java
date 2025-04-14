@@ -50,8 +50,8 @@ public class SecurityConfig {
                                 .requestMatchers(GET, "/card").hasAnyRole(ADMIN.name())
                                 .requestMatchers(GET, "/card/{id}").hasAnyRole(ADMIN.name(), USER.name())
                                 .requestMatchers(POST, "/card/**").hasAnyRole(ADMIN.name())
-//                                .requestMatchers(PATCH, "/card/**").hasAnyRole(ADMIN.name()) TODO
-//                                .requestMatchers(DELETE, "/card/**").hasAnyRole(ADMIN.name()) TODO
+                                .requestMatchers(PATCH, "/card/**").hasAnyRole(ADMIN.name())
+                                .requestMatchers(DELETE, "/card/**").hasAnyRole(ADMIN.name())
                                 .anyRequest()
                                 .authenticated()
                 )

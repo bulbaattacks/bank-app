@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import ru.effectmobile.bank_app.entity.User;
+import ru.effectmobile.bank_app.exception.EntityNotFoundException;
 import ru.effectmobile.bank_app.repository.UserRepository;
 
 @RestController
@@ -24,6 +25,6 @@ public class UserController {
         if (authenticatedUser.getRole() != User.Role.ADMIN && !authenticatedUser.getId().equals(id)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        return userRepository.findById(id).orElseThrow();
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
     }
 }
