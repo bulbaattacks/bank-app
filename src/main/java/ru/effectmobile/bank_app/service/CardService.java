@@ -18,27 +18,37 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
+    private final EncryptionServiceDes encryptionService;
 
     public CardDto createCard(CardDto dto) {
         var userId = dto.getOwnerId();
         var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId));
+
+        dto.setNumber(encryptionService.encrypt(dto.getNumber()));
         var card = Card.map(dto, user);
         cardRepository.save(card);
 
         dto.setId(card.getId());
         dto.setValidityPeriod(card.getValidityPeriod());
+        dto.setNumber(encryptionService.decrypt(card.getNumber()));
         return dto;
     }
 
     public List<CardDto> getAllCards() {
         return cardRepository.findAll().stream()
-                .map(CardDto::map)
+                .map(e -> {
+                    e.setNumber(encryptionService.decrypt(e.getNumber()));
+                    return CardDto.map(e);
+                })
                 .toList();
     }
 
     public List<CardDto> getCardsByUserId(Long userId) {
         return cardRepository.getAllByUserId(userId).stream()
-                .map(CardDto::map)
+                .map(e -> {
+                    e.setNumber(encryptionService.decrypt(e.getNumber()));
+                    return CardDto.map(e);
+                })
                 .toList();
     }
 

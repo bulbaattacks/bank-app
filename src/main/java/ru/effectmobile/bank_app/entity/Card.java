@@ -1,7 +1,9 @@
 package ru.effectmobile.bank_app.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import ru.effectmobile.bank_app.dto.CardDto;
 
 import java.time.LocalDate;
@@ -14,7 +16,7 @@ public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer number;
+    private String number;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -38,5 +40,4 @@ public class Card {
     }
 
     public enum Status {ACTIVE, BLOCKED, EXPIRED}
-
 }
