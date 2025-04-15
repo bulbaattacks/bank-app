@@ -6,10 +6,8 @@ import ru.effectmobile.bank_app.dto.CardDto;
 
 import java.time.LocalDate;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "cards")
 public class Card {
@@ -26,22 +24,17 @@ public class Card {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    public static class CardBuilder {
-        private LocalDate validityPeriod;
-
-        public CardBuilder validityPeriod() {
-            this.validityPeriod = LocalDate.now().plusYears(1);
-            return this;
-        }
+    public void setValidityPeriod() {
+        this.validityPeriod = LocalDate.now().plusYears(1);
     }
 
     public static Card map(CardDto dto, User user) {
-        return Card.builder()
-                .number(dto.getNumber())
-                .user(user)
-                .validityPeriod()
-                .status(dto.getStatus())
-                .build();
+        var card = new Card();
+        card.setNumber(dto.getNumber());
+        card.setUser(user);
+        card.setValidityPeriod();
+        card.setStatus(dto.getStatus());
+        return card;
     }
 
     public enum Status {ACTIVE, BLOCKED, EXPIRED}

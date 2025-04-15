@@ -26,6 +26,7 @@ public class CardService {
         cardRepository.save(card);
 
         dto.setId(card.getId());
+        dto.setValidityPeriod(card.getValidityPeriod());
         return dto;
     }
 
