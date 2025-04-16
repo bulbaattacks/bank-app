@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.effectmobile.bank_app.entity.Card;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Transactional(readOnly = true)
@@ -19,4 +20,6 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Modifying
     @Query("update Card c set c.status = :status where c.id = :id")
     int updateStatus(@Param(value = "id") Long id, @Param(value = "status") Card.Status status);
+
+    Optional<Card> findByIdAndUserId(Long cardId, Long userId);
 }

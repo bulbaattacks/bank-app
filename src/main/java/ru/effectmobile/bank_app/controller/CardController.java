@@ -1,6 +1,7 @@
 package ru.effectmobile.bank_app.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class CardController {
     }
 
     @PostMapping("/card")
-    public CardDto createCard(@RequestBody CardDto dto) {
+    public CardDto createCard(@Valid @RequestBody CardDto dto) {
         return service.createCard(dto);
     }
 
