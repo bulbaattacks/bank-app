@@ -24,6 +24,10 @@ public class CardDto {
     private LocalDate validityPeriod;
     @NotNull
     private Card.Status status;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Boolean isAtm = Boolean.FALSE;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Long balance;
 
     public static CardDto map(Card entity) {
         var dto = new CardDto();
@@ -32,6 +36,7 @@ public class CardDto {
         dto.setOwnerId(entity.getUser().getId());
         dto.setValidityPeriod(entity.getValidityPeriod());
         dto.setStatus(entity.getStatus());
+        dto.setIsAtm(entity.isAtm());
         return dto;
     }
 }

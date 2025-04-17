@@ -1,6 +1,5 @@
 package ru.effectmobile.bank_app.auth;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -8,9 +7,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.effectmobile.bank_app.entity.User;
 import ru.effectmobile.bank_app.repository.UserRepository;
-
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -50,20 +46,5 @@ public class AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-    }
-
-    @PostConstruct
-    private void populateUserTable(){
-        var user = User.builder()
-                .email(UUID.randomUUID().toString())
-                .password(passwordEncoder.encode("123"))
-                .role(User.Role.USER)
-                .build();
-        var admin = User.builder()
-                .email(UUID.randomUUID().toString())
-                .password(passwordEncoder.encode("123"))
-                .role(User.Role.ADMIN)
-                .build();
-        userRepository.saveAll(List.of(user, admin));
     }
 }

@@ -1,43 +1,31 @@
 package ru.effectmobile.bank_app.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import ru.effectmobile.bank_app.dto.CardDto;
+import lombok.*;
 
 import java.time.LocalDate;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
-@Setter
 @Entity
 @Table(name = "cards")
 public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Setter
     private String number;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    @Setter(AccessLevel.NONE)
     private LocalDate validityPeriod;
+    @Setter
     @Enumerated(EnumType.STRING)
     private Status status;
-
-    public void setValidityPeriod() {
-        this.validityPeriod = LocalDate.now().plusYears(1);
-    }
-
-    public static Card map(CardDto dto, User user) {
-        var card = new Card();
-        card.setNumber(dto.getNumber());
-        card.setUser(user);
-        card.setValidityPeriod();
-        card.setStatus(dto.getStatus());
-        return card;
-    }
+    private boolean isAtm;
 
     public enum Status {ACTIVE, BLOCKED, EXPIRED}
 }
