@@ -5,12 +5,16 @@ import org.springframework.stereotype.Service;
 import ru.effectmobile.bank_app.dto.DepositDto;
 import ru.effectmobile.bank_app.dto.TransactionDto;
 import ru.effectmobile.bank_app.entity.Card;
+import ru.effectmobile.bank_app.entity.Limit;
 import ru.effectmobile.bank_app.entity.Transaction;
 import ru.effectmobile.bank_app.exception.*;
 import ru.effectmobile.bank_app.repository.CardRepository;
+import ru.effectmobile.bank_app.repository.LimitRepository;
 import ru.effectmobile.bank_app.repository.TransactionCacheRepository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +22,7 @@ public class TransactionService {
 
     private final CardRepository cardRepository;
     private final TransactionCacheRepository transactionRepository;
+    private final LimitRepository limitRepository;
 
     public List<TransactionDto> getAllTransactionHistory() {
         return transactionRepository.findAll().stream()
@@ -54,6 +59,8 @@ public class TransactionService {
         cardIsActive(fromCard);
         cardIsActive(toCard);
 
+        checkLimits(fromCard);
+
         var balanceFromCard = getBalanceFromCache(fromCard.getId());
         if (balanceFromCard - dto.getAmount() < 0) {
             throw new InsufficientFundsException(fromCard.getId());
@@ -64,6 +71,7 @@ public class TransactionService {
                 .toCard(toCard)
                 .amount(dto.getAmount())
                 .user(fromCard.getUser())
+                .date(LocalDate.now())
                 .build();
         transactionRepository.save(tx, fromCard.getId(), toCard.getId());
     }
@@ -78,6 +86,7 @@ public class TransactionService {
                 .toCard(toCard)
                 .amount(dto.getAmount())
                 .user(toCard.getUser())
+                .date(LocalDate.now())
                 .build();
         transactionRepository.save(tx, toCard.getId());
     }
@@ -89,6 +98,30 @@ public class TransactionService {
     private void cardIsActive(Card card) {
         if (card.getStatus() != Card.Status.ACTIVE) {
             throw new CardStatusException(card.getId());
+        }
+    }
+
+    private void checkLimits(Card card) {
+        Optional<Limit> limitOpt = limitRepository.findByCardId(card.getId());
+        if (limitOpt.isEmpty()) return;
+
+        var limit = limitOpt.get();
+        var dailyLimit = limit.getDailyLimit();
+        var monthlyLimit = limit.getMonthlyLimit();
+
+        var date = LocalDate.now();
+        if (dailyLimit != null) {
+            var dailyWithdraw = transactionRepository.countDailyWithdraw(date, card.getId());
+            if (dailyWithdraw >= dailyLimit) {
+                throw new DailyLimitException();
+            }
+        }
+
+        if (monthlyLimit != null) {
+            var monthlyWithdraw = transactionRepository.countMonthlyWithdraw(date, card.getId());
+            if (monthlyWithdraw >= monthlyLimit) {
+                throw new MonthlyLimitException();
+            }
         }
     }
 }

@@ -57,6 +57,7 @@ public class SecurityConfig {
                                 .requestMatchers(GET, "/transaction_history").hasAnyRole(ADMIN.name(), USER.name())
                                 .requestMatchers(POST, "/transaction").hasAnyRole(ADMIN.name(), USER.name())
                                 .requestMatchers(POST, "/deposit").hasAnyRole(ADMIN.name(), USER.name())
+                                .requestMatchers(POST, "/add_limit").hasAnyRole(ADMIN.name())
                                 .anyRequest()
                                 .authenticated()
                 )

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.effectmobile.bank_app.entity.Transaction;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,6 +33,14 @@ public class TransactionCacheRepository {
     public void save(Transaction tx, Long toCardId) {
         transactionRepository.save(tx);
         findInDbAndUpdateCache(toCardId);
+    }
+
+    public long countDailyWithdraw(LocalDate date, Long cardId) {
+        return transactionRepository.countDailyWithdraw(date, cardId);
+    }
+
+    public long countMonthlyWithdraw(LocalDate date, Long cardId) {
+        return transactionRepository.countMonthlyWithdraw(date.withDayOfMonth(1), date, cardId);
     }
 
     public Long getBalanceFromCache(Long cardId) {
