@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.effectmobile.bank_app.entity.Transaction;
 
+import java.util.List;
+
 @Repository
 @Transactional(readOnly = true)
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
@@ -16,4 +18,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Query("select COALESCE(sum(t.amount), 0) from Transaction t where t.fromCard.id = :cardId")
     long countWithdrawAmount(@Param(value = "cardId") Long cardId);
+
+    List<Transaction> findAllByUserId(Long userId);
 }

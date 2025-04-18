@@ -1,5 +1,6 @@
 package ru.effectmobile.bank_app.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,9 +9,11 @@ import lombok.Setter;
 @Getter
 public class TransactionDto {
     @NotNull
-    private Long fromCard;
+    private Long fromCardId;
     @NotNull
-    private Long toCard;
+    private Long toCardId;
     @NotNull
     private Long amount;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String email;
 }

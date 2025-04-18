@@ -50,6 +50,7 @@ public class CardService {
         dto.setId(card.getId());
         dto.setValidityPeriod(card.getValidityPeriod());
         dto.setNumber(encryptionService.decrypt(card.getNumber()));
+        dto.setBalance(transactionService.getBalanceFromCache(dto.getId()));
         return dto;
     }
 
