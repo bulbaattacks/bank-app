@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.effectmobile.bank_app.dto.DepositDto;
 import ru.effectmobile.bank_app.dto.TransactionDto;
+import ru.effectmobile.bank_app.entity.Card;
 import ru.effectmobile.bank_app.entity.Transaction;
+import ru.effectmobile.bank_app.exception.*;
 import ru.effectmobile.bank_app.repository.CardRepository;
 import ru.effectmobile.bank_app.repository.TransactionCacheRepository;
 
@@ -44,12 +46,17 @@ public class TransactionService {
     }
 
     public void createTransaction(TransactionDto dto, Long ownerId) {
-        var fromCard = cardRepository.findByIdAndUserId(dto.getFromCardId(), ownerId).orElseThrow();
-        var toCard = cardRepository.findByIdAndUserId(dto.getToCardId(), ownerId).orElseThrow();
+        var fromCard = cardRepository.findByIdAndUserId(dto.getFromCardId(), ownerId)
+                .orElseThrow(() -> new CardOwnerException(dto.getFromCardId(), ownerId));
+        var toCard = cardRepository.findByIdAndUserId(dto.getToCardId(), ownerId)
+                .orElseThrow(() -> new CardOwnerException(dto.getToCardId(), ownerId));
+
+        cardIsActive(fromCard);
+        cardIsActive(toCard);
 
         var balanceFromCard = getBalanceFromCache(fromCard.getId());
         if (balanceFromCard - dto.getAmount() < 0) {
-            throw new RuntimeException("Not enough money on card");
+            throw new InsufficientFundsException(fromCard.getId());
         }
 
         var tx = Transaction.builder()
@@ -62,8 +69,10 @@ public class TransactionService {
     }
 
     public void deposit(DepositDto dto) {
-        var toCard = cardRepository.findByIdAndIsAtmFalse(dto.getToCardId()).orElseThrow();
-        var atm = cardRepository.findFirstByIsAtmTrue().orElseThrow();
+        var toCard = cardRepository.findByIdAndIsAtmFalse(dto.getToCardId())
+                .orElseThrow(() -> new EntityNotFoundException(dto.getToCardId()));
+        cardIsActive(toCard);
+        var atm = cardRepository.findFirstByIsAtmTrue().orElseThrow(ATMNotFoundException::new);
         var tx = Transaction.builder()
                 .fromCard(atm)
                 .toCard(toCard)
@@ -75,5 +84,11 @@ public class TransactionService {
 
     public Long getBalanceFromCache(Long cardId) {
         return transactionRepository.getBalanceFromCache(cardId);
+    }
+
+    private void cardIsActive(Card card) {
+        if (card.getStatus() != Card.Status.ACTIVE) {
+            throw new CardStatusException(card.getId());
+        }
     }
 }
