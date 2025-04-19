@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - include:
+      file: classpath:/db/changelog/changes/01-create-users-table.sql
+  - include:
+      file: classpath:/db/changelog/changes/02-create-cards-table.sql
+  - include:
+      file: classpath:/db/changelog/changes/03-create-blocked-cards-table.sql
+  - include:
+      file: classpath:/db/changelog/changes/04-transactions-table.sql
+  - include:
+      file: classpath:/db/changelog/changes/05-limits-table.sql
