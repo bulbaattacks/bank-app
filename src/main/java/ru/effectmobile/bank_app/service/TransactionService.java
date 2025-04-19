@@ -79,7 +79,7 @@ public class TransactionService {
 
     public void deposit(DepositDto dto) {
         var toCard = cardRepository.findByIdAndIsAtmFalse(dto.getToCardId())
-                .orElseThrow(() -> new EntityNotFoundException(dto.getToCardId()));
+                .orElseThrow(() -> new CardNotFoundException(dto.getToCardId()));
         cardIsActive(toCard);
         var atm = cardRepository.findFirstByIsAtmTrue().orElseThrow(ATMNotFoundException::new);
         var tx = Transaction.builder()
@@ -98,7 +98,7 @@ public class TransactionService {
 
     private void cardIsActive(Card card) {
         if (card.getStatus() != Card.Status.ACTIVE) {
-            throw new CardStatusException(card.getId());
+            throw new CardStatusNotActiveException(card.getId());
         }
     }
 

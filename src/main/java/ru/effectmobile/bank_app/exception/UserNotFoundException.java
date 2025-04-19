@@ -3,10 +3,10 @@ package ru.effectmobile.bank_app.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-public class CardStatusException extends ResponseStatusException {
-    public static final String MSG = "Card id: %d, status can not be set manually";
+public class UserNotFoundException extends ResponseStatusException {
+    public static final String MSG = "User id: %d, not found";
 
-    public CardStatusException(Long id) {
+    public UserNotFoundException(Long id) {
         super(HttpStatus.BAD_REQUEST, MSG.formatted(id));
     }
 }

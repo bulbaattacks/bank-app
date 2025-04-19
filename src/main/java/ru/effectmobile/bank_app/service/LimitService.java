@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.effectmobile.bank_app.dto.LimitDto;
 import ru.effectmobile.bank_app.entity.Card;
 import ru.effectmobile.bank_app.entity.Limit;
-import ru.effectmobile.bank_app.exception.EntityNotFoundException;
+import ru.effectmobile.bank_app.exception.CardNotFoundException;
 import ru.effectmobile.bank_app.repository.CardRepository;
 import ru.effectmobile.bank_app.repository.LimitRepository;
 
@@ -18,7 +18,7 @@ public class LimitService {
 
     public void addLimit(LimitDto dto) {
         Card cardToLimit = cardRepository.findByIdAndIsAtmFalse(dto.getCardId())
-                .orElseThrow(() -> new EntityNotFoundException(dto.getCardId()));
+                .orElseThrow(() -> new CardNotFoundException(dto.getCardId()));
         Limit limit = Limit.builder()
                 .card(cardToLimit)
                 .dailyLimit(dto.getDailyLimit())

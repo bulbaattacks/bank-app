@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.effectmobile.bank_app.entity.Card;
 import ru.effectmobile.bank_app.entity.CardToBlock;
-import ru.effectmobile.bank_app.exception.EntityNotFoundException;
+import ru.effectmobile.bank_app.exception.CardNotFoundException;
 import ru.effectmobile.bank_app.repository.CardRepository;
 import ru.effectmobile.bank_app.repository.CardToBlockRepository;
 
@@ -28,7 +28,7 @@ public class CardToBlockService {
 
     public void addCardToBlock(Long cardId, Long ownerId) {
         Card cardToBlock = cardRepository.findByIdAndUserId(cardId, ownerId)
-                .orElseThrow(() -> new EntityNotFoundException(cardId));
+                .orElseThrow(() -> new CardNotFoundException(cardId));
         CardToBlock entity = new CardToBlock();
         entity.setCard(cardToBlock);
         cardToBlockRepository.save(entity);

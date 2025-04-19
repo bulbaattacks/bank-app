@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.effectmobile.bank_app.dto.CardDto;
 import ru.effectmobile.bank_app.entity.Card;
 import ru.effectmobile.bank_app.entity.User;
+import ru.effectmobile.bank_app.exception.CardStatusException;
 import ru.effectmobile.bank_app.service.CardService;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class CardController {
 
     private final CardService service;
 
-    @GetMapping("/card")
+    @GetMapping("/cards")
     @PageableAsQueryParam
     public List<CardDto> getAllCards(@PageableDefault(value = 20, sort = "id", direction = Sort.Direction.ASC)
                                      @Parameter(hidden = true) Pageable pageable,
@@ -35,7 +36,7 @@ public class CardController {
         return service.getAllCards(pageable, statusFilter);
     }
 
-    @GetMapping("/card/{userId}")
+    @GetMapping("/cards/{userId}")
     public List<CardDto> getCardsByUserId(@PathVariable("userId") Long userId, Authentication auth) {
         var authenticatedUser = ((User) auth.getPrincipal());
         if (authenticatedUser.getRole() != User.Role.ADMIN && !authenticatedUser.getId().equals(userId)) {
@@ -44,21 +45,21 @@ public class CardController {
         return service.getCardsByUserId(userId);
     }
 
-    @PostMapping("/card")
+    @PostMapping("/cards")
     public CardDto createCard(@Valid @RequestBody CardDto dto) {
         return service.createCard(dto);
     }
 
-    @PatchMapping("/card/{id}")
+    @PatchMapping("/cards/{id}")
     public void updateStatus(@PathVariable("id") Long id, @NotNull Card.Status status) {
         if (status.equals(Card.Status.EXPIRED)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new CardStatusException(id);
         }
         service.updateStatus(id, status);
     }
 
-    @DeleteMapping("/card/{id}")
+    @DeleteMapping("/cards/{id}")
     public void deleteStatus(@PathVariable("id") Long id) {
-        service.deleteStatus(id);
+        service.deleteCard(id);
     }
 }

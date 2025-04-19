@@ -2,12 +2,11 @@ package ru.effectmobile.bank_app.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ru.effectmobile.bank_app.dto.CardDto;
 import ru.effectmobile.bank_app.entity.Card;
-import ru.effectmobile.bank_app.exception.EntityNotFoundException;
+import ru.effectmobile.bank_app.exception.CardNotFoundException;
+import ru.effectmobile.bank_app.exception.UserNotFoundException;
 import ru.effectmobile.bank_app.repository.CardRepository;
 import ru.effectmobile.bank_app.repository.UserRepository;
 
@@ -30,6 +29,7 @@ public class CardService {
     }
 
     public List<CardDto> getCardsByUserId(Long userId) {
+        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         return cardRepository.getAllByUserId(userId).stream()
                 .map(this::buildDto)
                 .toList();
@@ -37,7 +37,7 @@ public class CardService {
 
     public CardDto createCard(CardDto dto) {
         var userId = dto.getOwnerId();
-        var user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId));
+        var user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         dto.setNumber(encryptionService.encrypt(dto.getNumber()));
         var card = Card.builder()
@@ -59,12 +59,12 @@ public class CardService {
     public void updateStatus(Long id, Card.Status status) {
         var updateResult = cardRepository.updateStatus(id, status);
         if (updateResult == 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new CardNotFoundException(id);
         }
     }
 
-    public void deleteStatus(Long id) {
-        var card = cardRepository.findByIdAndIsAtmFalse(id).orElseThrow(() -> new EntityNotFoundException(id));
+    public void deleteCard(Long id) {
+        var card = cardRepository.findByIdAndIsAtmFalse(id).orElseThrow(() -> new CardNotFoundException(id));
         cardRepository.delete(card);
     }
 
