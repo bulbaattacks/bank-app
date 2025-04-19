@@ -1,6 +1,7 @@
 package ru.effectmobile.bank_app.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.effectmobile.bank_app.dto.DepositDto;
 import ru.effectmobile.bank_app.dto.TransactionDto;
@@ -24,8 +25,8 @@ public class TransactionService {
     private final TransactionCacheRepository transactionRepository;
     private final LimitRepository limitRepository;
 
-    public List<TransactionDto> getAllTransactionHistory() {
-        return transactionRepository.findAll().stream()
+    public List<TransactionDto> getAllTransactionHistory(Pageable pageable, Long amountFilter) {
+        return transactionRepository.findAll(pageable, amountFilter).stream()
                 .map(entity -> {
                     var dto = new TransactionDto();
                     dto.setFromCardId(entity.getFromCard().getId());
@@ -37,8 +38,8 @@ public class TransactionService {
                 .toList();
     }
 
-    public List<TransactionDto> getTransactionHistoryByUserId(Long userId) {
-        return transactionRepository.findAllByUserId(userId).stream()
+    public List<TransactionDto> getTransactionHistoryByUserId(Long userId, Pageable pageable, Long amountFilter) {
+        return transactionRepository.findAllByUserId(userId, pageable, amountFilter).stream()
                 .map(entity -> {
                     var dto = new TransactionDto();
                     dto.setFromCardId(entity.getFromCard().getId());

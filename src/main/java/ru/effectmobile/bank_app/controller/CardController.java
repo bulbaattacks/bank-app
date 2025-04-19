@@ -1,9 +1,14 @@
 package ru.effectmobile.bank_app.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +28,11 @@ public class CardController {
     private final CardService service;
 
     @GetMapping("/card")
-    public List<CardDto> getAllCards() {
-        return service.getAllCards();
+    @PageableAsQueryParam
+    public List<CardDto> getAllCards(@PageableDefault(value = 20, sort = "id", direction = Sort.Direction.ASC)
+                                     @Parameter(hidden = true) Pageable pageable,
+                                     @RequestParam(required = false) Card.Status statusFilter) {
+        return service.getAllCards(pageable, statusFilter);
     }
 
     @GetMapping("/card/{userId}")

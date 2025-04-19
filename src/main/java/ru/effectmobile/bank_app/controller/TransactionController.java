@@ -1,13 +1,15 @@
 package ru.effectmobile.bank_app.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.effectmobile.bank_app.dto.DepositDto;
 import ru.effectmobile.bank_app.dto.TransactionDto;
 import ru.effectmobile.bank_app.entity.User;
@@ -23,12 +25,16 @@ public class TransactionController {
     private final TransactionService service;
 
     @GetMapping("/transaction_history")
-    public List<TransactionDto> getTransactionHistory(Authentication auth) {
+    @PageableAsQueryParam
+    public List<TransactionDto> getTransactionHistory(Authentication auth,
+                                                      @PageableDefault(value = 20, sort = "date", direction = Sort.Direction.ASC)
+                                                      @Parameter(hidden = true) Pageable pageable,
+                                                      @RequestParam(required = false) Long amountFilter) {
         var authenticatedUser = ((User) auth.getPrincipal());
         if (authenticatedUser.getRole() == User.Role.ADMIN) {
-            return service.getAllTransactionHistory();
+            return service.getAllTransactionHistory(pageable, amountFilter);
         } else {
-            return service.getTransactionHistoryByUserId(authenticatedUser.getId());
+            return service.getTransactionHistoryByUserId(authenticatedUser.getId(), pageable, amountFilter);
         }
     }
 

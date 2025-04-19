@@ -1,5 +1,6 @@
 package ru.effectmobile.bank_app.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,5 +31,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                               @Param(value = "end") LocalDate end,
                               @Param(value = "cardId") Long cardId);
 
-    List<Transaction> findAllByUserId(Long userId);
+    @Query("select t from Transaction t where t.user.id = :userId and " +
+            "(:amountFilter is null or t.amount >= :amountFilter)")
+    List<Transaction> findAllByUserId(Long userId, Pageable pageable, Long amountFilter);
+
+    @Query("select t from Transaction t where " +
+            "(:amountFilter is null or t.amount >= :amountFilter)")
+    List<Transaction> findAllByAmount(Pageable pageable, Long amountFilter);
 }

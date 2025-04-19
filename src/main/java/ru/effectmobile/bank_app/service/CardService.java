@@ -1,6 +1,7 @@
 package ru.effectmobile.bank_app.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,8 +23,8 @@ public class CardService {
     private final EncryptionServiceDes encryptionService;
     private final TransactionService transactionService;
 
-    public List<CardDto> getAllCards() {
-        return cardRepository.findAllByIsAtmFalse().stream()
+    public List<CardDto> getAllCards(Pageable pageable, Card.Status statusFilter) {
+        return cardRepository.findAllByIsAtmFalseAndStatus(pageable, statusFilter).stream()
                 .map(this::buildDto)
                 .toList();
     }

@@ -1,6 +1,7 @@
 package ru.effectmobile.bank_app.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import ru.effectmobile.bank_app.entity.Transaction;
 
@@ -15,12 +16,12 @@ public class TransactionCacheRepository {
     private final TransactionRepository transactionRepository;
     private final ConcurrentHashMap<Long, Long> cardBalanceCache = new ConcurrentHashMap<>();
 
-    public List<Transaction> findAll() {
-        return transactionRepository.findAll();
+    public List<Transaction> findAll(Pageable pageable, Long amountFilter) {
+        return transactionRepository.findAllByAmount(pageable, amountFilter);
     }
 
-    public List<Transaction> findAllByUserId(Long userId) {
-        return transactionRepository.findAllByUserId(userId);
+    public List<Transaction> findAllByUserId(Long userId, Pageable pageable, Long amountFilter) {
+        return transactionRepository.findAllByUserId(userId, pageable, amountFilter);
     }
 
 
